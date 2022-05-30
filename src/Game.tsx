@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import Square from './components/Square'
+import { ReactNotifications, Store } from 'react-notifications-component'
+import 'react-notifications-component/dist/theme.css'
 
 type Scores = {
   [key: string]: number
@@ -50,9 +52,30 @@ function Game() {
     setGameState(initial_game_state)
   }
 
-  const handleWin = () => {
-    window.alert(`Congrats Player ${currentPlayer} You Won.`)
+  const winNotification = (currentPlayer: string) => {
+    Store.addNotification({
+      title: "Game Won!",
+      message: `Congrats player ${currentPlayer}! You are the winner!`,
+      type: "success", insert: "top", container: "top-right",
+      animationIn: ["animate__animated", "animate__fadeIn"],
+      animationOut: ["animate__animated", "animate__fadeOut"],
+      dismiss: { duration: 5000,onScreen: true}
+    });
+  }
 
+  const drawNotification = () => {
+    Store.addNotification({
+      title: "Game Drawn!",
+      message: "The game ended in a draw",
+      type: "info", insert: "top", container: "top-right",
+      animationIn: ["animate__animated", "animate__fadeIn"],
+      animationOut: ["animate__animated", "animate__fadeOut"],
+      dismiss: { duration: 5000,onScreen: true}
+    });
+  }
+  const handleWin = () => {
+    // window.alert(`Congrats Player ${currentPlayer} You Won.`)
+    winNotification(currentPlayer)
     // calculate score
     const newPlayerScore = scores[currentPlayer] + 1;
     const newScores = { ...scores };
@@ -63,7 +86,7 @@ function Game() {
   }
 
   const handleDraw = () => {
-    window.alert(`The game ended in a draw`)
+    drawNotification()
   }
 
   const checkForWinner = () => {
@@ -125,6 +148,7 @@ function Game() {
 
   return (
     <div className="h-full h-screen p-8 md:p-16 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
+      <ReactNotifications />
       <h1 className="text-center text-5xl mb-4 font-display text-white">
       Tic Tac Toe Game.
       </h1>
