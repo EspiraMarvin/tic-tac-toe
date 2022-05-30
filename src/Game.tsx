@@ -25,6 +25,11 @@ function Game() {
     checkForWinner()
   }, [gameState])
 
+  // reset/ restart board
+  const resetBoard = () => {
+    setGameState(initial_game_state)
+  }
+
   const handleWin = () => {
     window.alert(`Congrats Player ${currentPlayer} You Won.`)
   }
@@ -74,15 +79,14 @@ function Game() {
 
   const changePlayer = () => {
     // change current to the next player - if current is X change to Y and vice versa
-    console.log('game state changed', currentPlayer)
+    // console.log('game state changed', currentPlayer)
      setCurrentPlayer(currentPlayer === 'X' ? '0' : 'X')
   }
 
   const handleClick = (e:  React.ChangeEvent<HTMLDivElement>) => {
-    console.log('cell clicked', e.target.getAttribute("data-cell-index"))
     const cellIndex = Number(e.target.getAttribute("data-cell-index"))
+    // set clicked cell index value equal to game state index
     const currentValue = gameState[cellIndex]
-    console.log('current value', currentValue)
     if (currentValue) {
       return
     }
@@ -96,7 +100,7 @@ function Game() {
   return (
     <div className="h-full h-screen p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
       <h1 className="text-center text-5xl mb-4 font-display text-white">
-      Tic Tac Toe Game Page
+      Tic Tac Toe Game.
       </h1>
     <div>
       <div className="grid grid-cols-3 gap-3 mx-auto w-96">
@@ -107,6 +111,15 @@ function Game() {
               onClick={handleClick}
           />
         )) }
+      </div>
+      
+      <div className='flex items-center justify-center'>
+        <button 
+          onClick={resetBoard}
+          className='font-display text-lg mt-8 px-20 py-4 rounded-3xl hover:bg-slate-900 hover:text-white bg-sky-50' 
+        >
+          Restart Game
+          </button>
       </div>
 
       <div>Scores go here</div>
