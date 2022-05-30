@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react'
 import Square from './components/Square'
 
+type Scores = {
+  [key: string]: number
+}
+
+
 const initial_game_state = ["", "", "", "", "", "", "", "", ""]
+const initial_scores: Scores = { X: 0, O: 0}
 
 // combinations to win the game
 const winning_combos = [
@@ -19,9 +25,23 @@ function Game() {
 
   const [gameState, setGameState] = useState(initial_game_state)
   const [currentPlayer, setCurrentPlayer] = useState("X")
+  const [scores, setScores] = useState(initial_scores)
 
   useEffect(() => {
-    // check for a winner after every move
+    // when component mounts, get score from localStorage
+    const storedScores = localStorage.getItem("scores")
+    if (storedScores) {
+      setScores(JSON.parse(storedScores))
+    }
+  }, [])
+
+  useEffect(() => {
+    // check for a winner after every move/ if game has been started
+    if (gameState === initial_game_state) {
+      // this means game has not been started
+      return
+    }
+    // game been started, now check winner
     checkForWinner()
   }, [gameState])
 
@@ -32,6 +52,14 @@ function Game() {
 
   const handleWin = () => {
     window.alert(`Congrats Player ${currentPlayer} You Won.`)
+
+    // calculate score
+    const newPlayerScore = scores[currentPlayer] + 1;
+    const newScores = { ...scores };
+    newScores[currentPlayer] = newPlayerScore;
+    setScores(newScores);
+    localStorage.setItem("scores", JSON.stringify(newScores))
+
   }
 
   const handleDraw = () => {
@@ -74,13 +102,12 @@ function Game() {
     }
 
     changePlayer()
-
   }
 
   const changePlayer = () => {
     // change current to the next player - if current is X change to Y and vice versa
     // console.log('game state changed', currentPlayer)
-     setCurrentPlayer(currentPlayer === 'X' ? '0' : 'X')
+     setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X')
   }
 
   const handleClick = (e:  React.ChangeEvent<HTMLDivElement>) => {
@@ -94,11 +121,10 @@ function Game() {
     const newValues = [...gameState] // create new state/ dont mutate
     newValues[cellIndex] = currentPlayer // set a cell to equal the current player
     setGameState(newValues)
-
   }
 
   return (
-    <div className="h-full h-screen p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
+    <div className="h-full h-screen p-8 md:p-16 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
       <h1 className="text-center text-5xl mb-4 font-display text-white">
       Tic Tac Toe Game.
       </h1>
@@ -116,13 +142,18 @@ function Game() {
       <div className='flex items-center justify-center'>
         <button 
           onClick={resetBoard}
-          className='font-display text-lg mt-8 px-20 py-4 rounded-3xl hover:bg-slate-900 hover:text-white bg-sky-50' 
+          className='font-display tracking-wide text-lg mt-8 px-16 py-4 rounded-3xl
+          bg-gradient-to-r from-green-200 to-blue-200 hover:from-blue-200 hover:to-green-200' 
         >
           Restart Game
           </button>
       </div>
 
-      <div>Scores go here</div>
+      <div className='mx-auto w-96 text-2xl text-serif'>
+        <p className='text-white mt-5'>Next Player: <span>{currentPlayer}</span></p>
+        <p className='text-white mt-5'>Player X wins: <span>{scores["X"]}</span></p>
+        <p className='text-white mt-5'>Player O wins: <span>{scores["O"]}</span></p>
+      </div>
     </div>
     </div>
   )
